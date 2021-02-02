@@ -1,21 +1,19 @@
-import socket
+import socketserver
 import json
 import os
+import sqlite3
+from tcphandler import ServerTCPHandler
 
-configpath = os.path.join(os.path.dirname(__file__), 'config.json')
+
+dirname = os.path.dirname(__file__)
+configpath = os.path.join(dirname, 'config.json')
 config = json.load(open(configpath))
+
+conn = sqlite3.connect(os.path.join(dirname, 'db.sqlite3'))
 
 HOST = config['HOST']
 PORT = config['SOCKETPORT']
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    conn, addr = s.accept()
-    with conn:
-        print('Connected by', addr)
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.sendall(data)
+if __name__ == '__main__':
+    with socketserver.TCPServer((HOST, PORT), ServerTCPHandler) as server:
+        server.serve_forever()
