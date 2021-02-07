@@ -1,8 +1,13 @@
-import socket
+import json
+import os
 from client import Client
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 65432        # The port used by the server
+dirname = os.path.dirname(__file__)
+configpath = os.path.join(dirname, 'config.json')
+config = json.load(open(configpath))
+
+HOST = config['HOST']
+PORT = config['SOCKETPORT']
 
 wallet_client = Client(HOST, PORT)
 wallet_client.login()

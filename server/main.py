@@ -1,8 +1,8 @@
-import socketserver
 import json
 import os
 import sqlite3
 from tcphandler import ServerTCPHandler
+from server import SqliteTCPServer
 from database import *
 
 
@@ -16,6 +16,5 @@ HOST = config['HOST']
 PORT = config['SOCKETPORT']
 
 if __name__ == '__main__':
-    with socketserver.TCPServer((HOST, PORT), ServerTCPHandler) as server:
-        server.RequestHandlerClass.test = "test1234"
+    with SqliteTCPServer((HOST, PORT), ServerTCPHandler, conn) as server:
         server.serve_forever()
