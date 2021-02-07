@@ -42,8 +42,8 @@ exit:
                     'ACTION': 'BALANCE',
                     'ID': self.id
                 }) + '\n', 'utf-8'))
-                print(str(self.socket.recv(1024), 'utf-8'))
-                print(json.loads(str(self.socket.recv(1024), 'utf-8'))['AMOUNT'] + "$")
+                data = json.loads(str(self.socket.recv(1024), 'utf-8'))
+                print(str(data['AMOUNT']) + "$") 
             if command.startswith('addmoney'):
                 if len(command.split()) > 1:
                     amount = command.split()[1]
@@ -52,6 +52,11 @@ exit:
                         'AMOUNT': int(amount),
                         'ID': self.id
                     }) + '\n', 'utf-8'))
+                    data = json.loads(str(self.socket.recv(1024), 'utf-8'))
+                    if data['SUCCESS']:
+                        print(str(data['AMOUNT']) + '$')
+                    else:
+                        print(data['ERROR'])
                 else:
                     print("Error: amount argument is required")
             if command.startswith('transfer'):
@@ -64,6 +69,11 @@ exit:
                         'AMOUNT': int(amount),
                         'ID': self.id
                     }) + '\n', 'utf-8'))
+                    data = json.loads(str(self.socket.recv(1024), 'utf-8'))
+                    if data['SUCCESS']:
+                        print(amount + '$ successfully transferred to ' + otherid)
+                    else:
+                        print(data['ERROR'])
                 elif not command.split()[2].isdigit():
                     print("Error: amount must be a number")
                 elif len(command.split()) > 1:
@@ -78,6 +88,8 @@ exit:
                         'AMOUNT': int(amount),
                         'ID': self.id
                     }) + '\n', 'utf-8'))
+                    data = json.loads(str(self.socket.recv(1024), 'utf-8'))
+                    print('Limit set to ' + str(data['AMOUNT']))
                 else:
                     print("Error: amount argument is required")
             if command.startswith('test'):
@@ -93,3 +105,8 @@ exit:
                     print("Error: test argument is required")
             if command != "exit":
                 self.loop(False)
+            else:
+                self.socket.send(bytes(json.dumps({
+                    'ACTION': 'EXIT',
+                    'ID': self.id
+                }) + '\n', 'utf-8'))
